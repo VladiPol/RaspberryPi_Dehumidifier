@@ -19,7 +19,7 @@ import RPi.GPIO as GPIO
 # The humidity alert in %
 humidity_alert = 65
 # The humidity calibration in % for sensor
-humidity_alert_calibration = 25
+humidity_alert_calibration = 6
 # The temperature  calibration in Grad Celcius for sensor
 temperature_alert_calibration = 0
 
@@ -27,20 +27,25 @@ temperature_alert_calibration = 0
 # The humidity dictionary for On/Off test 
 humidity_test = [55, 65, 70, 64, 64, 66, 55]
 
-# GPIO Schema
-# 123xxxxxxxxxx
-# xxx4x5xxxxxx6
+# GPIO Schema (PINs numbers see below)
+# 1x2xxxxxxxxxx
+# 3xx4x5xxxxxx6
+# https://www.raspberry-pi-geek.com/var/rpi/storage/images/media/images/gpio/4965-1-eng-US/gpio_lightbox.png
+# https://raspi.tv/2014/rpi-gpio-quick-reference-updated-for-raspberry-pi-b
+#
+# https://tutorials-raspberrypi.de/raspberry-pi-luftfeuchtigkeit-temperatur-messen-dht11-dht22/
+# https://tutorials-raspberrypi.de/raspberry-pi-relais-schalter-steuern/
 ######################################
-# 1 - orange (relay plus oder VCC)
-# 2 - blue   (DHT minus or Ground)
-# 3 - red    (DHT plus)
-# 4 - yellow (DHT Signal)
-# 5 - green  (relay Signal)
-# 6 - black  (relay minus or Ground)
+# 1 - orange (relay plus oder VCC   - Pin 2)
+# 2 - blue   (DHT minus or Ground   - Pin 6)
+# 3 - red    (DHT plus oder VCC     - Pin 1)
+# 4 - yellow (DHT Signal            - Pin 7)
+# 5 - green  (relay Signal          - Pin 11)
+# 6 - black  (relay minus or Ground - Pin 25)
 ######################################
 
 ####### Start of Init of DHT sensor #######
-# The DHT11 Sensor is installed on the GPIO 4 (Pin 7)
+# The DHT11 Signal Sensor is installed on the GPIO 4 (Pin 7)
 sensor = ADHT.DHT11
 sensor_GPIO_Nr = 4
 ####### End of Init of DHT sensor #########
@@ -77,47 +82,50 @@ if __name__ == '__main__':
     logger.info('Time(dd.mm.yyyy)|Temp(Celcius)|Humidity(%)')    
 
     #for counter in range(0, len(humidity_test)):
-    while True:
+    try:
+        while True:
 
-        # Get humidity and temperature
-        humidity, temperature = ADHT.read_retry(sensor, sensor_GPIO_Nr)
+            # Get humidity and temperature
+            humidity, temperature = ADHT.read_retry(sensor, sensor_GPIO_Nr)
 
-        # Calibrate sensor
-        humidity = humidity - humidity_alert_calibration
-        temperature = temperature - temperature_alert_calibration
-        
-        # Get humidity and temperature for On/Off test
-        # humidity = humidity_test[counter]
-        
-        # Get time of messuring
-        dattime = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-
-        # Print humidity and temperature
-        if humidity is not None and temperature is not None:
-            # calibrate the 
-            print('Time={0}  Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(dattime, temperature, humidity))
-            # logger.info('Time={0}  Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(dattime, temperature, humidity))
-            # new format is csv-file with '|' is delimeter for the load in the database database
-            logger.info('{0}|{1:0.1f}|{2:0.1f}'.format(dattime, temperature, humidity))
-        else:
-            # TO DO: try to take the measuring 3 times after that in error case abort
-            print('Failed to get reading humidity and temperature. Try again!')
-            logger.info('Time={0}  Failed to get reading humidity and temperature. Try again!'.format(dattime))           
-            sys.exit(1)        
-
-        if humidity > humidity_alert:
-            # Relais an
-            GPIO.output(relay_GPIO_Pin, GPIO.HIGH)
-        else:
-            # Relais aus
-            GPIO.output(relay_GPIO_Pin, GPIO.LOW)
+            # Calibrate sensor
+            humidity = humidity - humidity_alert_calibration
+            temperature = temperature - temperature_alert_calibration
             
-        # Warte <time_to_sleep> seconds
-        time.sleep(time_to_sleep)
+            # Get humidity and temperature for On/Off test
+            # humidity = humidity_test[counter]
+            
+            # Get time of measuring
+            dattime = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
 
-    ########## End of Main part ##############
+            # Print humidity and temperature
+            if humidity is not None and temperature is not None:
+                # calibrate the 
+                print('Time={0}  Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(dattime, temperature, humidity))
+                # logger.info('Time={0}  Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(dattime, temperature, humidity))
+                # new format is csv-file with '|' is delimeter for the load in the database database
+                logger.info('{0}|{1:0.1f}|{2:0.1f}'.format(dattime, temperature, humidity))
+            else:
+                # TO DO: try to take the measuring 3 times after that in error case abort
+                print('Failed to get reading humidity and temperature. Try again!')
+                logger.info('Time={0}  Failed to get reading humidity and temperature. Try again!'.format(dattime))           
+                sys.exit(1)        
 
-    # Wird zum Putzen of all benoetigt
-    # GPIO.cleanup()
-    # message = "End of GPIO-Script"
-    # print (message)
+            if humidity > humidity_alert:
+                # Relais an
+                GPIO.output(relay_GPIO_Pin, GPIO.HIGH)
+            else:
+                # Relais aus
+                GPIO.output(relay_GPIO_Pin, GPIO.LOW)
+                
+            # Warte <time_to_sleep> seconds
+            time.sleep(time_to_sleep)
+
+    except KeyboardInterrupt:
+        # cleanup the GPIO after Keyboard interraption
+        GPIO.cleanup()
+        print ('End of GPIO-Script')
+    except Exception as error:        
+        raise error
+
+    ########## End of Main part ##############    
