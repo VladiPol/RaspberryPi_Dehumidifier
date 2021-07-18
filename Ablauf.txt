@@ -1,0 +1,50 @@
+Rapberry Pi
+
+1. Vorbereitung der Karte via Raspberry Pi Imager (https://youtu.be/ntaXWS8Lk34)
+2. Es wird die LIGHT Version installiert
+3. Alte OS Version cat  /etc/os-release
+    PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"
+    NAME="Raspbian GNU/Linux"
+    VERSION_ID="9"
+    VERSION="9 (stretch)"
+    ID=raspbian
+    ID_LIKE=debian
+    HOME_URL="http://www.raspbian.org/"
+    SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+    BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+4. Neue OS Version  cat /etc/os-release
+    PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+    NAME="Raspbian GNU/Linux"
+    VERSION_ID="10"
+    VERSION="10 (buster)"
+    VERSION_CODENAME=buster
+    ID=raspbian
+    ID_LIKE=debian
+    HOME_URL="http://www.raspbian.org/"
+    SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+    BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+5. Python 2.7.16 ist per default installiert
+6. Verzeichnis fuer DHT erstellen
+    mkdir GPIO_Dryer
+7. Dateien via WinSCP uebertragen
+8. Aktualisieren der Pakete aus der Sourcelist. Damit wir sichergehen können das unser System aktuell ist starten wir kurz ein Update mit dem Befehl
+    sudo apt-get update
+    sudo apt full-upgrade
+9. Per default kommt unser OS mit dem Python 2, was eigentlich fuer diese Zwecke ausreichend ist. Nur pip-installer ist bei der LIGHT Version nicht vorhanden und muss installiert werden
+    sudo apt-get install python-pip
+10. Installieren der Adafruit_DHT Bibliothek mit pip. Der wohl einfachste weg ist die Installation mit “pip"
+11. DHT11 mit GPIO Pins verbinden
+12. Relais mit GPIO Pins verbinden
+13. DHT11 testen und kolibrieren
+14. Relais via RaspberryPi zum Testen einschaten / ausschalten
+15. Skript auf RaspberryPi kopieren und starten (laufen lassen)
+16. Log-Datei überprüfen
+
+Kosten ca. 90€ Dauer ca. 2 Stunden:
+1. RaspberryPi ca. 35€
+2. DHT11 bis 5€
+3. SRD-05VDC-SL-C bis 5€
+4. Entfeuchter ca. 45€
+
+
+    
